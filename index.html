@@ -56,6 +56,8 @@
             background: #ff1493;
         }
     </style>
+    <!-- Add Supabase script -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 <body>
     <header>
@@ -82,9 +84,14 @@
     </main>
 
     <script>
+        // Initialize Supabase client
+        const supabaseUrl = 'https://your-project-url.supabase.co';
+        const supabaseKey = 'your-public-api-key';
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
         document.addEventListener("DOMContentLoaded", loadMemories);
 
-        function addMemory() {
+        async function addMemory() {
             const fileInput = document.getElementById('imageUpload');
             const textInput = document.getElementById('memoryText');
             const messageInput = document.getElementById('cuteMessage');
@@ -97,9 +104,9 @@
             const file = fileInput.files[0];
             const reader = new FileReader();
 
-            reader.onload = function(event) {
+            reader.onload = async function(event) {
                 const memory = { image: event.target.result, text: textInput.value, message: messageInput.value };
-                saveMemory(memory);
+                await saveMemory(memory);
                 displayMemory(memory);
                 
                 fileInput.value = '';
@@ -110,15 +117,28 @@
             reader.readAsDataURL(file);
         }
 
-        function saveMemory(memory) {
-            let memories = JSON.parse(localStorage.getItem("memories")) || [];
-            memories.push(memory);
-            localStorage.setItem("memories", JSON.stringify(memories));
+        async function saveMemory(memory) {
+            const { data, error } = await supabase
+                .from('memories')
+                .insert([memory]);
+
+            if (error) {
+                console.error('Error saving memory:', error);
+            } else {
+                console.log('Memory saved:', data);
+            }
         }
 
-        function loadMemories() {
-            let memories = JSON.parse(localStorage.getItem("memories")) || [];
-            memories.forEach(displayMemory);
+        async function loadMemories() {
+            const { data: memories, error } = await supabase
+                .from('memories')
+                .select('*');
+
+            if (error) {
+                console.error('Error loading memories:', error);
+            } else {
+                memories.forEach(displayMemory);
+            }
         }
 
         function displayMemory(memory) {
