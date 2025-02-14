@@ -19,6 +19,24 @@
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
+        .gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 20px;
+        }
+        .memory {
+            border: 2px solid #fff;
+            border-radius: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.6);
+            max-width: 200px;
+            text-align: center;
+        }
+        .memory img {
+            max-width: 100%;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -38,6 +56,40 @@
         </section>
     </main>
 
-    <script src="script.js"></script>
+    <script>
+        function addMemory() {
+            const fileInput = document.getElementById('imageUpload');
+            const textInput = document.getElementById('memoryText');
+            const gallery = document.getElementById('gallery');
+
+            if (fileInput.files.length === 0 || textInput.value.trim() === '') {
+                alert('Please select an image and write a memory.');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(event) {
+                const memoryDiv = document.createElement('div');
+                memoryDiv.classList.add('memory');
+
+                const img = document.createElement('img');
+                img.src = event.target.result;
+                
+                const note = document.createElement('p');
+                note.textContent = textInput.value;
+                
+                memoryDiv.appendChild(img);
+                memoryDiv.appendChild(note);
+                gallery.appendChild(memoryDiv);
+
+                fileInput.value = '';
+                textInput.value = '';
+            };
+            
+            reader.readAsDataURL(file);
+        }
+    </script>
 </body>
 </html>
