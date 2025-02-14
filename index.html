@@ -19,13 +19,13 @@
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-        .gallery {
+        .gallery, .messages {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
             padding: 20px;
         }
-        .memory {
+        .memory, .message {
             border: 2px solid #fff;
             border-radius: 10px;
             padding: 10px;
@@ -37,6 +37,24 @@
             max-width: 100%;
             border-radius: 5px;
         }
+        .message {
+            font-style: italic;
+            color: #ff69b4;
+        }
+        .cute-button {
+            background: #ff69b4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .cute-button:hover {
+            background: #ff1493;
+        }
     </style>
 </head>
 <body>
@@ -46,14 +64,20 @@
     
     <main>
         <section class="upload-section">
-            <input type="file" id="imageUpload" accept="image/*">
+            <input type="file" id="imageUpload" accept="image/*" class="cute-button">
             <textarea id="memoryText" placeholder="Write a note about this memory..."></textarea>
             <input type="text" id="cuteMessage" placeholder="Write a cute message...">
-            <button onclick="addMemory()">Add Memory</button>
+            <button onclick="addMemory()" class="cute-button">Add Memory</button>
         </section>
 
         <section class="gallery" id="gallery">
+            <h2>Memories</h2>
             <!-- Memories will appear here -->
+        </section>
+        
+        <section class="messages" id="messages">
+            <h2>Cute Messages</h2>
+            <!-- Messages will appear here -->
         </section>
     </main>
 
@@ -64,7 +88,6 @@
             const fileInput = document.getElementById('imageUpload');
             const textInput = document.getElementById('memoryText');
             const messageInput = document.getElementById('cuteMessage');
-            const gallery = document.getElementById('gallery');
 
             if (fileInput.files.length === 0 || textInput.value.trim() === '') {
                 alert('Please select an image and write a memory.');
@@ -100,24 +123,27 @@
 
         function displayMemory(memory) {
             const gallery = document.getElementById('gallery');
+            const messagesSection = document.getElementById('messages');
+            
             const memoryDiv = document.createElement('div');
             memoryDiv.classList.add('memory');
-
+            
             const img = document.createElement('img');
             img.src = memory.image;
             
             const note = document.createElement('p');
             note.textContent = memory.text;
             
-            const message = document.createElement('p');
-            message.textContent = `💌 ${memory.message}`;
-            message.style.fontStyle = "italic";
-            message.style.color = "#ff69b4";
-            
             memoryDiv.appendChild(img);
             memoryDiv.appendChild(note);
-            memoryDiv.appendChild(message);
             gallery.appendChild(memoryDiv);
+            
+            if (memory.message.trim() !== '') {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message');
+                messageDiv.textContent = `💌 ${memory.message}`;
+                messagesSection.appendChild(messageDiv);
+            }
         }
     </script>
 </body>
