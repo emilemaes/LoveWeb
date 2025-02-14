@@ -48,6 +48,7 @@
         <section class="upload-section">
             <input type="file" id="imageUpload" accept="image/*">
             <textarea id="memoryText" placeholder="Write a note about this memory..."></textarea>
+            <input type="text" id="cuteMessage" placeholder="Write a cute message...">
             <button onclick="addMemory()">Add Memory</button>
         </section>
 
@@ -57,9 +58,12 @@
     </main>
 
     <script>
+        document.addEventListener("DOMContentLoaded", loadMemories);
+
         function addMemory() {
             const fileInput = document.getElementById('imageUpload');
             const textInput = document.getElementById('memoryText');
+            const messageInput = document.getElementById('cuteMessage');
             const gallery = document.getElementById('gallery');
 
             if (fileInput.files.length === 0 || textInput.value.trim() === '') {
@@ -71,24 +75,49 @@
             const reader = new FileReader();
 
             reader.onload = function(event) {
-                const memoryDiv = document.createElement('div');
-                memoryDiv.classList.add('memory');
-
-                const img = document.createElement('img');
-                img.src = event.target.result;
+                const memory = { image: event.target.result, text: textInput.value, message: messageInput.value };
+                saveMemory(memory);
+                displayMemory(memory);
                 
-                const note = document.createElement('p');
-                note.textContent = textInput.value;
-                
-                memoryDiv.appendChild(img);
-                memoryDiv.appendChild(note);
-                gallery.appendChild(memoryDiv);
-
                 fileInput.value = '';
                 textInput.value = '';
+                messageInput.value = '';
             };
             
             reader.readAsDataURL(file);
+        }
+
+        function saveMemory(memory) {
+            let memories = JSON.parse(localStorage.getItem("memories")) || [];
+            memories.push(memory);
+            localStorage.setItem("memories", JSON.stringify(memories));
+        }
+
+        function loadMemories() {
+            let memories = JSON.parse(localStorage.getItem("memories")) || [];
+            memories.forEach(displayMemory);
+        }
+
+        function displayMemory(memory) {
+            const gallery = document.getElementById('gallery');
+            const memoryDiv = document.createElement('div');
+            memoryDiv.classList.add('memory');
+
+            const img = document.createElement('img');
+            img.src = memory.image;
+            
+            const note = document.createElement('p');
+            note.textContent = memory.text;
+            
+            const message = document.createElement('p');
+            message.textContent = `💌 ${memory.message}`;
+            message.style.fontStyle = "italic";
+            message.style.color = "#ff69b4";
+            
+            memoryDiv.appendChild(img);
+            memoryDiv.appendChild(note);
+            memoryDiv.appendChild(message);
+            gallery.appendChild(memoryDiv);
         }
     </script>
 </body>
